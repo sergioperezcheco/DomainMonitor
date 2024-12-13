@@ -45,7 +45,7 @@ addEventListener('fetch', event => {
         <html>
           <head>
             <meta charset="UTF-8">
-            <title>域名到期检查</title>
+            <title>域名到期监测</title>
             <style>
               body {
                 font-family: Arial, sans-serif;
@@ -85,7 +85,7 @@ addEventListener('fetch', event => {
           </head>
           <body>
             <div class="container">
-              <h1>域名到期检查</h1>
+              <h1>域名到期监测</h1>
               <table id="domainTable">
                 <thead>
                   <tr>
@@ -170,10 +170,10 @@ addEventListener('fetch', event => {
         <html>
           <head>
             <meta charset="UTF-8">
-            <title>域名到期检查</title>
+            <title>域名到期监测</title>
           </head>
           <body>
-            <h1>域名到期检查</h1>
+            <h1>域名到期监测</h1>
             <p>错误: ${error.message}</p>
           </body>
         </html>
