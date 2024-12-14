@@ -41,14 +41,17 @@ async function handleRequest(request) {
                 const registrar = registrarMatch ? registrarMatch[1].trim() : '--';
                 let registrarUrl = registrarUrlMatch ? registrarUrlMatch[1].replace(/\\\//g, '/') : '--';
 
+                // 如果注册商名称超过25个字符，进行截断并添加省略号
+                const truncatedRegistrar = registrar.length > 25 ? registrar.substring(0, 20) + "..." : registrar;
+
                 // 调试信息
-                console.log(`Domain: ${domain}, Registrar: ${registrar}, Registrar URL: ${registrarUrl}`);
+                console.log(`Domain: ${domain}, Registrar: ${registrar}, Truncated Registrar: ${truncatedRegistrar}, Registrar URL: ${registrarUrl}`);
 
                 return {
                     domain,
                     expiryDate: formattedExpiryDate,
                     remainingDays,
-                    registrar,
+                    registrar: truncatedRegistrar,
                     registrarUrl
                 };
             } catch (error) {
@@ -125,7 +128,7 @@ async function handleRequest(request) {
                                         <td>${result.domain}</td>
                                         <td>${result.expiryDate}</td>
                                         <td>${result.remainingDays}</td>
-                                        <td>${result.registrar !== '--' ? `<a href="${result.registrarUrl}" target="_blank">${result.registrar}</a>` : '--'}</td>
+                                        <td>${result.registrar !== '--' ? `<a href="${result.registrarUrl}" target="_blank" title="${result.registrar}">${result.registrar}</a>` : '--'}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -178,8 +181,7 @@ async function handleRequest(request) {
                         function parseDate(dateStr) {
                             const parts = dateStr.split(".");
                             return new Date(parts[0], parts[1] - 1, parts[2]); // 月份从0开始，所以需要减1
-                        }            
-                        
+                        }
                     </script>
                 </body>
             </html>
