@@ -1,53 +1,68 @@
 addEventListener('fetch', event => {
     event.respondWith(handleRequest(event.request));
-  });
-  
-  async function handleRequest(request) {
+});
+
+async function handleRequest(request) {
     const domains = DOMAIN_NAMES.split(','); // 从环境变量获取多个域名
-  
+
     try {
         // 存储每个域名的查询结果
         const results = await Promise.all(domains.map(async (domain) => {
             // 去除域名两端的空格
             domain = domain.trim();
-  
+
             try {
                 // 使用 fetch 调用 whois.vu API 服务来查询域名信息
                 const response = await fetch(`https://api.whois.vu/?q=${domain}`);
                 const data = await response.json();
-  
+
                 // 检查 API 返回的数据是否包含 'expires' 字段
                 if (!data.expires) {
                     throw new Error(`API response for ${domain} does not contain an "expires" field`);
                 }
-  
+
                 // 解析 'expires' 字段（Unix 时间戳）
                 const expiryDate = new Date(data.expires * 1000); // 将 Unix 时间戳转换为毫秒
                 if (isNaN(expiryDate.getTime())) {
                     throw new Error(`Invalid expiry date format for ${domain}`);
                 }
-  
+
                 const currentDate = new Date();
                 const remainingDays = Math.ceil((expiryDate - currentDate) / (1000 * 60 * 60 * 24));
-  
+
                 // 格式化日期为 YYYY.M.D
                 const formattedExpiryDate = `${expiryDate.getFullYear()}.${expiryDate.getMonth() + 1}.${expiryDate.getDate()}`;
-  
+
+                // 使用正则表达式提取注册商和注册商URL
+                const whoisText = data.whois || '';
+                const registrarMatch = whoisText.match(/Registrar:\s*([^\r\n]+)/i);
+                const registrarUrlMatch = whoisText.match(/Registrar URL:\s*(http[^\s]+)/i);
+
+                const registrar = registrarMatch ? registrarMatch[1].trim() : '--';
+                let registrarUrl = registrarUrlMatch ? registrarUrlMatch[1].replace(/\\\//g, '/') : '--';
+
+                // 调试信息
+                console.log(`Domain: ${domain}, Registrar: ${registrar}, Registrar URL: ${registrarUrl}`);
+
                 return {
                     domain,
                     expiryDate: formattedExpiryDate,
-                    remainingDays
+                    remainingDays,
+                    registrar,
+                    registrarUrl
                 };
             } catch (error) {
                 console.error(`Error fetching or parsing WHOIS data for ${domain}:`, error);
                 return {
                     domain,
                     expiryDate: '--',
-                    remainingDays: '--'
+                    remainingDays: '--',
+                    registrar: '--',
+                    registrarUrl: '--'
                 };
             }
         }));
-  
+
         // 构建 HTML 响应
         const html = `
             <!DOCTYPE html>
@@ -101,6 +116,7 @@ addEventListener('fetch', event => {
                                     <th onclick="sortTable(0)">域名</th>
                                     <th onclick="sortTable(1)">到期时间</th>
                                     <th onclick="sortTable(2)">剩余天数</th>
+                                    <th onclick="sortTable(3)">注册商</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -109,14 +125,15 @@ addEventListener('fetch', event => {
                                         <td>${result.domain}</td>
                                         <td>${result.expiryDate}</td>
                                         <td>${result.remainingDays}</td>
+                                        <td>${result.registrar !== '--' ? `<a href="${result.registrarUrl}" target="_blank">${result.registrar}</a>` : '--'}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>
                         </table>
                     </div>
                     <script>
-                        let sortDirection = [true, true, true]; // 初始排序方向：true 表示升序，false 表示降序
-  
+                        let sortDirection = [true, true, true, true]; // 初始排序方向：true 表示升序，false 表示降序
+
                         function sortTable(n) {
                             const table = document.getElementById("domainTable");
                             let switching = true, shouldSwitch;
@@ -167,13 +184,13 @@ addEventListener('fetch', event => {
                 </body>
             </html>
         `;
-  
+
         return new Response(html, {
             headers: { 'content-type': 'text/html; charset=UTF-8' },
         });
     } catch (error) {
         console.error('Error fetching or parsing WHOIS data:', error);
-  
+
         const html = `
             <!DOCTYPE html>
             <html>
@@ -187,9 +204,9 @@ addEventListener('fetch', event => {
                 </body>
             </html>
         `;
-  
+
         return new Response(html, {
             headers: { 'content-type': 'text/html; charset=UTF-8' },
         });
     }
-  }
+}
