@@ -41,8 +41,8 @@ async function handleRequest(request) {
                 const registrar = registrarMatch ? registrarMatch[1].trim() : '--';
                 let registrarUrl = registrarUrlMatch ? registrarUrlMatch[1].replace(/\\\//g, '/') : '--';
 
-                // 如果注册商名称超过25个字符，进行截断并添加省略号
-                const truncatedRegistrar = registrar.length > 25 ? registrar.substring(0, 20) + "..." : registrar;
+                // 如果注册商名称超过20个字符，进行截断并添加省略号
+                const truncatedRegistrar = registrar.length > 20 ? registrar.substring(0, 17) + "..." : registrar;
 
                 // 调试信息
                 console.log(`Domain: ${domain}, Registrar: ${registrar}, Truncated Registrar: ${truncatedRegistrar}, Registrar URL: ${registrarUrl}`);
@@ -161,8 +161,8 @@ async function handleRequest(request) {
                                         xVal = parseDate(xVal);
                                         yVal = parseDate(yVal);
                                     } else if (n === 2) { // 数字列
-                                        xVal = parseInt(xVal, 10);
-                                        yVal = parseInt(yVal, 10);
+                                        xVal = xVal === '--' ? Infinity : parseInt(xVal, 10);
+                                        yVal = yVal === '--' ? Infinity : parseInt(yVal, 10);
                                     }
                         
                                     // 进行比较
@@ -179,6 +179,7 @@ async function handleRequest(request) {
                         }
                         
                         function parseDate(dateStr) {
+                            if (dateStr === '--') return Infinity;
                             const parts = dateStr.split(".");
                             return new Date(parts[0], parts[1] - 1, parts[2]); // 月份从0开始，所以需要减1
                         }
