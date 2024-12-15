@@ -79,10 +79,14 @@ async function handleRequest(request) {
                             margin: 0;
                             background-color: #f4f4f4;
                             user-select: none; /* 禁止选中 */
+                            display: flex;
+                            flex-direction: column;
+                            min-height: 100vh;
                         }
                         .container {
                             text-align: center;
                             padding-top: 50px;
+                            flex: 1;
                         }
                         table {
                             border-collapse: collapse;
@@ -107,6 +111,25 @@ async function handleRequest(request) {
                         h1 {
                             text-align: center;
                             margin-top: 0;
+                        }
+                        footer {
+                            text-align: center;
+                            padding: 10px;
+                            background-color: #f2f2f2;
+                            position: fixed;
+                            width: 100%;
+                            bottom: 0;
+                        }
+                        footer a {
+                            color: #000;
+                            text-decoration: none;
+                        }
+                        footer a:hover {
+                            text-decoration: underline;
+                        }
+                        .github-icon {
+                            width: 24px;
+                            height: 24px;
                         }
                     </style>
                 </head>
@@ -134,6 +157,11 @@ async function handleRequest(request) {
                             </tbody>
                         </table>
                     </div>
+                    <footer>
+                        <a href="https://github.com/sergioperezcheco/DomainMonitor" target="_blank">
+                            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" class="github-icon">
+                        </a>
+                    </footer>
                     <script>
                         let sortDirection = [true, true, true, true]; // 初始排序方向：true 表示升序，false 表示降序
 
