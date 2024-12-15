@@ -128,8 +128,8 @@ async function handleRequest(request) {
                             text-decoration: underline;
                         }
                         .github-icon {
-                            width: 24px;
-                            height: 24px;
+                            width: 32px; /* 调整图标大小 */
+                            height: 32px; /* 调整图标大小 */
                         }
                     </style>
                 </head>
@@ -159,7 +159,7 @@ async function handleRequest(request) {
                     </div>
                     <footer>
                         <a href="https://github.com/sergioperezcheco/DomainMonitor" target="_blank">
-                            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" class="github-icon">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" class="github-icon">
                         </a>
                     </footer>
                     <script>
